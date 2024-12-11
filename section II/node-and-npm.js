@@ -55,10 +55,13 @@ const server = http.createServer((request, response) => {
   /* --------------------------------- ROUTING -------------------------------- */
   // url modules helps to parse the url elements ?id=2321&abc=54398, exemple.
 
-  const pathName = request.url;
+  // console.log(request.url)
+  // console.log(url.parse(request.url, true)); // use true to convert to object
+
+  const { query, pathname } = url.parse(request.url, true);
 
   // OVERVIEW
-  if (pathName === "/overview" || pathName === "/") {
+  if (pathname === "/overview" || pathname === "/") {
     response.writeHead(200, { "content-type": "text/html" });
 
     const cardsHTML = dataObj
@@ -69,11 +72,14 @@ const server = http.createServer((request, response) => {
     response.end(output);
 
     // PRODUCT PAGE
-  } else if (pathName === "/product") {
-    response.end("This is product");
+  } else if (pathname === "/product") {
+    response.writeHead(200, { "content-type": "text/html" });
+    const product = dataObj[query.id];
+    const output = replaceTemplate(templateProduct, product);
+    response.end(output);
 
     // API
-  } else if (pathName === "/api") {
+  } else if (pathname === "/api") {
     response.writeHead(200, { "Content-type": "application/json" });
     response.end(data);
   } else {
