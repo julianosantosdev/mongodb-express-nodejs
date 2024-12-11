@@ -2,9 +2,7 @@
 /*                                   MODULES                                  */
 /* -------------------------------------------------------------------------- */
 const fs = require("fs");
-const { fstat } = require("fs");
 const http = require("http");
-const { it } = require("node:test");
 const url = require("url");
 
 // const textIn = fs.readFileSync('./txt/input.txt', 'utf-8');
@@ -18,8 +16,38 @@ const url = require("url");
 /* -------------------------------------------------------------------------- */
 /*                                   SERVER                                   */
 /* -------------------------------------------------------------------------- */
+const replaceTemplate = (template, product) => {
+  let output = template.replace(/{%PRODUCTNAME%}/g, product.productName); // using g all those placeholders will be replaced, not only one.
+  output = output.replace(/{%IMAGE%}/g, product.image);
+  output = output.replace(/{%PRICE%}/g, product.price);
+  output = output.replace(/{%FROM%}/g, product.from);
+  output = output.replace(/{%NUTRIENTS%}/g, product.nutrients);
+  output = output.replace(/{%QUANTITY%}/g, product.quantity);
+  output = output.replace(/{%DESCRIPTION%}/g, product.description);
+  output = output.replace(/{%ID%}/g, product.id);
+
+  if (!product.organic) {
+    output = output.replace(/{%NOT_ORGANIC%}/g, "not-organic");
+  }
+
+  return output;
+};
+
+const templateOverview = fs.readFileSync(
+  `${__dirname}/templates/template-overview.html`,
+  "utf-8"
+);
+const templateProduct = fs.readFileSync(
+  `${__dirname}/templates/template-product.html`,
+  "utf-8"
+);
+const templateCard = fs.readFileSync(
+  `${__dirname}/templates/template-card.html`,
+  "utf-8"
+);
+
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, "utf-8");
-// const dataObj = JSON.parse(data);
+const dataObj = JSON.parse(data);
 
 const server = http.createServer((request, response) => {
   console.log(request.url);
@@ -28,10 +56,23 @@ const server = http.createServer((request, response) => {
   // url modules helps to parse the url elements ?id=2321&abc=54398, exemple.
 
   const pathName = request.url;
-  if (pathName === "/overview") {
-    response.end("This is overview");
+
+  // OVERVIEW
+  if (pathName === "/overview" || pathName === "/") {
+    response.writeHead(200, { "content-type": "text/html" });
+
+    const cardsHTML = dataObj
+      .map((cardInfo) => replaceTemplate(templateCard, cardInfo))
+      .join("");
+
+    const output = templateOverview.replace("{%PRODUCT_CARDS%}", cardsHTML);
+    response.end(output);
+
+    // PRODUCT PAGE
   } else if (pathName === "/product") {
     response.end("This is product");
+
+    // API
   } else if (pathName === "/api") {
     response.writeHead(200, { "Content-type": "application/json" });
     response.end(data);
