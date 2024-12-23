@@ -47,7 +47,6 @@ fs.readFile("test-file.txt", () => {
   crypto.pbkdf2("password", "salt", 100000, 1024, "sha512", () => {
     console.log(Date.now() - start, "Password encrypetd");
   });
-
 });
 
 console.log("Hello from the top-level code");
