@@ -2,6 +2,10 @@ const express = require('express');
 const fs = require('fs');
 const app = express();
 
+// Middleware para analisar JSON
+app.use(express.json());
+// O corpo da requisição (JSON) estará acessível em req.body
+
 // app.get('/', (request, response) => {
 //   response
 //     .status(200)
@@ -20,6 +24,11 @@ app.get('/api/v1/tours', (request, response) => {
       tours,
     },
   });
+});
+
+app.post('/api/v1/tours', (request, response) => {
+  console.log(request.body);
+  response.send('Done');
 });
 
 const port = 3000;
