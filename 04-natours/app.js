@@ -6,13 +6,26 @@ const app = express();
 // O corpo da requisição (JSON) estará acessível em req.body
 app.use(express.json());
 
+app.use((request, response, next) => {
+  console.log('Hello from the middeware!');
+  next();
+});
+
+app.use((request, response, next) => {
+  request.requestTime = new Date().toISOString();
+  next();
+});
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (request, response) => {
+  console.log(request.requestTime);
+
   response.status(200).json({
     status: 'success',
+    requestedAt: request.requestTime,
     results: tours.length,
     data: {
       tours,
