@@ -1,10 +1,13 @@
 const express = require('express');
 const fs = require('fs');
 const app = express();
+const morgan = require('morgan');
 
+// 1) MIDDLEWARES
+app.use(morgan('dev'));
+app.use(express.json());
 // Middleware para analisar JSON
 // O corpo da requisição (JSON) estará acessível em req.body
-app.use(express.json());
 
 app.use((request, response, next) => {
   console.log('Hello from the middeware!');
@@ -20,6 +23,7 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
+// 2) ROUTES HANDLERS
 const getAllTours = (request, response) => {
   console.log(request.requestTime);
 
