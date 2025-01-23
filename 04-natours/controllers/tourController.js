@@ -4,6 +4,13 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkID = (request, response, next, val) => {
+  if (request.params.id * 1 > tours.length) {
+    return response.status(404).json({ status: 'fail', message: 'invalid ID' });
+  }
+  next();
+};
+
 exports.getAllTours = (request, response) => {
   console.log(request.requestTime);
 
@@ -22,10 +29,6 @@ exports.getTourById = (request, response) => {
   const id = request.params.id * 1;
   const tour = tours.find((item) => item.id === id);
 
-  if (!tour) {
-    return response.status(404).json({ status: 'fail', message: 'invalid ID' });
-  }
-
   response.status(200).json({
     status: 'success',
     data: {
@@ -35,8 +38,6 @@ exports.getTourById = (request, response) => {
 };
 
 exports.createTour = (request, response) => {
-  // console.log(request.body);
-
   const newId = tours[tours.length - 1].id + 1;
   const newTour = Object.assign({ id: newId }, request.body);
   tours.push(newTour);
@@ -55,10 +56,6 @@ exports.createTour = (request, response) => {
 };
 
 exports.updateTour = (request, response) => {
-  if (request.params.id * 1 > tours.length) {
-    return response.status(404).json({ status: 'fail', message: 'invalid ID' });
-  }
-
   response.status(200).json({
     status: 'sucess',
     data: {
@@ -68,16 +65,8 @@ exports.updateTour = (request, response) => {
 };
 
 exports.deleteTour = (request, response) => {
-  if (request.params.id * 1 > tours.length) {
-    return response.status(404).json({ status: 'fail', message: 'invalid ID' });
-  }
-
   response.status(204).json({
     status: 'sucess',
     data: null,
   });
 };
-
-
-
-
