@@ -5,8 +5,21 @@ const tours = JSON.parse(
 );
 
 exports.checkID = (request, response, next, val) => {
+  console.log(`The id is ${val}`);
+
   if (request.params.id * 1 > tours.length) {
     return response.status(404).json({ status: 'fail', message: 'invalid ID' });
+  }
+  next();
+};
+
+exports.checkBody = (request, response, next) => {
+  const bodyContent = request.body;
+
+  if (!bodyContent.name || !bodyContent.price) {
+    return response
+      .status(400)
+      .json({ status: 'fail', message: 'Missing name or price' });
   }
   next();
 };
@@ -42,7 +55,7 @@ exports.createTour = (request, response) => {
   const newTour = Object.assign({ id: newId }, request.body);
   tours.push(newTour);
   fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
+    `${__dirname}/../dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (error) => {
       response.status(201).json({
