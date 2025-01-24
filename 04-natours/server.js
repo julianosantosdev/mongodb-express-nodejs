@@ -16,7 +16,7 @@ mongoose
     // useCreateIndex: true, not used anymore
     // useFindAndModify: false, not used anymore
   })
-  .then((connect) => {
+  .then(() => {
     console.log('DB Connection Successfull');
   });
 
