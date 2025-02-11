@@ -2,12 +2,33 @@ const Tour = require('../models/tourModel');
 
 exports.getAllTours = async (request, response) => {
   try {
-    const allTours = await Tour.find();
+    // const filteredTours = await Tour.find({
+    //   duration: 5,
+    //   difficulty: 'easy',
+    // });
+
+    // BUILDING THE QUERY, without sending it or await, because we still can change the methods like sort etc, before executing it
+    const queryObj = { ...request.query };
+    const excludedFields = ['page', 'sort', 'field', 'limit'];
+    excludedFields.forEach((element) => delete queryObj[element]);
+
+    const query = Tour.find(queryObj);
+
+    // const filteredTours = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    // EXECUTING QUERY and awaiting for the results
+    const tours = await query;
+
+    // SEND RESPONSE
     response.status(200).json({
       status: 'success',
-      results: allTours.length,
+      results: tours.length,
       data: {
-        allTours,
+        tours,
       },
     });
   } catch (error) {
